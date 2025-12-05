@@ -4,6 +4,8 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 
+mongoose.set('strictQuery', true); // optional, suppress deprecation warning
+
 // Routes
 import stockRoutes from "./routes/stockRoutes.js";
 
@@ -16,7 +18,6 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use("/stocks", stockRoutes);
 
 // After middleware
 app.use("/stocks", stockRoutes);
@@ -28,14 +29,20 @@ if (!mongoUri) {
   process.exit(1);
 }
 
-mongoose.connect(mongoUri)
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.error("MongoDB connection error:", err));
+const startServer = async () => {
+  try {
+    await mongoose.connect(mongoUri);
+    console.log("MongoDB connected");
 
-// Test route
-app.get('/', (req, res) => {
-  res.send('Stock Scanner API is running...');
-});
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  } catch (err) {
+    console.error("MongoDB connection error:", err);
+    process.exit(1);
+  }
+};
+
+startServer();
+
 
 // Start server
 const PORT = process.env.PORT || 5000;
