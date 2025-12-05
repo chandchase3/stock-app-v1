@@ -16,7 +16,7 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
-
+app.use("/stocks", stockRoutes);
 
 // After middleware
 app.use("/stocks", stockRoutes);

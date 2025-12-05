@@ -1,6 +1,9 @@
 import express from "express";
 import Stock from "../models/Stock.js";
 
+import { fetchStockData } from "../utils/fetchStockData.js";
+
+
 const router = express.Router();
 
 // GET /stocks - get all stocks
@@ -36,5 +39,27 @@ router.delete("/:id", async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+
+// ================== TOP GAINERS ===================
+
+router.get("/top-gainers", async (req, res) => {
+  try {
+    const symbols = ["AAPL","MSFT","GOOG","AMZN","TSLA","NVDA","META","NFLX","AMD","INTC"];
+
+    // fetch all stock data in parallel
+    const stockDataArray = await Promise.all(symbols.map(symbol => fetchStockData(symbol)));
+
+    // sort by percentChange descending
+    const topGainers = stockDataArray
+      .sort((a, b) => b.percentChange - a.percentChange)
+      .slice(0, 10); // top 10
+
+    res.json(topGainers);
+  } catch (err) {
+    console.error("Error fetching top gainers:", err.message);
+    res.status(500).json({ error: "Failed to fetch top gainers" });
+  }
+});
+
 
 export default router;
