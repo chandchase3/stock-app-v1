@@ -4,6 +4,9 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 
+// Routes
+import stockRoutes from "./routes/stockRoutes.js";
+
 // Load environment variables from .env
 dotenv.config({ path: path.resolve('./server/.env') });
 
@@ -13,6 +16,10 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+
+// After middleware
+app.use("/stocks", stockRoutes);
 
 // Connect to MongoDB
 const mongoUri = process.env.MONGO_URI;
